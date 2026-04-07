@@ -1,2 +1,1 @@
-# simple-download-manager
-A multi-threaded download manager built with Python &amp; FastAPI
+We implemented a multi-threaded download manager with fault tolerance, bandwidth control, and true resume capability using HTTP Range requests and partial file recovery.
