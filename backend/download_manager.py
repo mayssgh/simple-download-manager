@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 from segment_worker import download_segment
 from models import DownloadStatus
 from bandwidth_limiter import BandwidthLimiter
+from history_manager import add_download, update_download
 
 
 class DownloadManager:
@@ -40,6 +41,10 @@ class DownloadManager:
             except Exception as e:
                 print(f"Download failed: {e}")
                 self.downloads[task_id]["status"] = DownloadStatus.FAILED
+
+                update_download(url, {
+                    "status": "failed"
+                })
             finally:
                 self.queue.task_done()
 
@@ -54,8 +59,17 @@ class DownloadManager:
             "stop_flag": {"stop": False},
             "start_time": time.time(),
             "filename": "",
-            "limiter": BandwidthLimiter(500_000)
+            "limiter": BandwidthLimiter(500_000),
+            "url": url
         }
+
+        # ✅ Add to history
+        add_download({
+            "url": url,
+            "filename": "",
+            "status": "pending",
+            "progress": 0
+        })
 
         self.queue.put((task_id, url))
 
@@ -71,7 +85,13 @@ class DownloadManager:
         data["filename"] = filename
         data["status"] = DownloadStatus.DOWNLOADING
 
-        # 🔥 RECOVER EXISTING PROGRESS (REAL RESUME)
+        # ✅ Update history (start)
+        update_download(url, {
+            "filename": filename,
+            "status": "downloading"
+        })
+
+        # 🔥 REAL RESUME SUPPORT
         existing_downloaded = 0
         part_files = []
 
@@ -89,6 +109,13 @@ class DownloadManager:
         def progress_callback(bytes_downloaded):
             with self.lock:
                 data["downloaded"] += bytes_downloaded
+
+                progress = (data["downloaded"] / data["total"]) * 100 if data["total"] else 0
+
+                # ✅ Update history live
+                update_download(url, {
+                    "progress": round(progress, 2)
+                })
 
         for i, (start, end) in enumerate(segments):
             part_file = part_files[i]
@@ -112,9 +139,24 @@ class DownloadManager:
         for thread in threads:
             thread.join()
 
-        if not data["stop_flag"]["stop"]:
-            self.merge_files(filename, part_files)
-            data["status"] = DownloadStatus.COMPLETED
+        # -------------------------------
+        # FINAL STATE
+        # -------------------------------
+        if data["stop_flag"]["stop"]:
+            data["status"] = DownloadStatus.PAUSED
+
+            update_download(url, {
+                "status": "paused"
+            })
+            return
+
+        self.merge_files(filename, part_files)
+        data["status"] = DownloadStatus.COMPLETED
+
+        update_download(url, {
+            "status": "completed",
+            "progress": 100
+        })
 
     # -------------------------------
     # HELPERS
@@ -157,14 +199,27 @@ class DownloadManager:
         self.downloads[task_id]["stop_flag"]["stop"] = True
         self.downloads[task_id]["status"] = DownloadStatus.PAUSED
 
+        update_download(self.downloads[task_id]["url"], {
+            "status": "paused"
+        })
+
     def cancel(self, task_id):
         self.downloads[task_id]["stop_flag"]["stop"] = True
         self.downloads[task_id]["status"] = DownloadStatus.CANCELLED
+
+        update_download(self.downloads[task_id]["url"], {
+            "status": "cancelled"
+        })
 
     def resume(self, task_id, url):
         if task_id in self.downloads:
             self.downloads[task_id]["stop_flag"]["stop"] = False
             self.downloads[task_id]["status"] = DownloadStatus.PENDING
+
+            update_download(url, {
+                "status": "downloading"
+            })
+
             self.queue.put((task_id, url))
 
     # -------------------------------
