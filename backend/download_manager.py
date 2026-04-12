@@ -245,3 +245,24 @@ class DownloadManager:
             "eta": int(eta) if eta else None,
             "status": data["status"]
         }
+    # -----------------------------------
+# Module-level bridge for main.py
+# -----------------------------------
+_manager = DownloadManager()
+
+def start_download(task_id: str, url: str):
+    _manager.start_download(task_id, url)
+
+def pause(task_id: str):
+    _manager.pause(task_id)
+
+def resume(task_id: str):
+    data = _manager.downloads.get(task_id)
+    url = data["url"] if data else ""
+    _manager.resume(task_id, url)
+
+def cancel(task_id: str):
+    _manager.cancel(task_id)
+
+def get_progress(task_id: str):
+    return _manager.get_progress(task_id)
