@@ -1,0 +1,140 @@
+[
+    {
+        "url": "https://www.africau.edu/images/default/sample.pdf",
+        "filename": "sample.pdf",
+        "status": "failed",
+        "progress": 0
+    },
+    {
+        "url": "https://ash-speed.hetzner.com/10MB.bin",
+        "filename": "10MB.bin",
+        "status": "failed",
+        "progress": 0
+    },
+    {
+        "url": "https://link.testfile.org/15MB",
+        "filename": "15MB",
+        "status": "failed",
+        "progress": 0
+    },
+    {
+        "url": "https://www.africau.edu/images/default/sample.pdf",
+        "filename": "sample.pdf",
+        "status": "failed",
+        "progress": 0
+    },
+    {
+        "url": "https://ash-speed.hetzner.com/10MB.bin",
+        "filename": "10MB.bin",
+        "status": "failed",
+        "progress": 0
+    },
+    {
+        "url": "https://www.w3.org/WAI/WCAG21/Techniques/pdf/img/table-word.jpg",
+        "filename": "table-word.jpg",
+        "status": "completed",
+        "progress": 100
+    },
+    {
+        "url": "https://www.bing.com/images/search?view=detailV2&ccid=cCFL3JE3&id=64A8B53E5540331B215AC081017D5216F4F4AE54&thid=OIP.cCFL3JE3FbFsE7phNpLxBAHaFj&mediaurl=https%3a%2f%2fwww.aquaportail.com%2fpictures1310%2fmer-mediterranee-bleue-corse.jpg&cdnurl=https%3a%2f%2fth.bing.com%2fth%2fid%2fR.70214bdc913715b16c13ba613692f104%3frik%3dVK709BZSfQGBwA%26pid%3dImgRaw%26r%3d0&exph=768&expw=1024&q=mer&FORM=IRPRST&ck=13FD14C235D0A59DE80866F8A0298613&selectedIndex=1&itb=0",
+        "filename": "search",
+        "status": "completed",
+        "progress": 100
+    },
+    {
+        "url": "https://ash-speed.hetzner.com/1MB.bin",
+        "filename": "1MB.bin",
+        "status": "failed",
+        "progress": 0
+    },
+    {
+        "url": "https://ash-speed.hetzner.com/1MB.bin",
+        "filename": "1MB.bin",
+        "status": "failed",
+        "progress": 0
+    },
+    {
+        "url": "https://ash-speed.hetzner.com/1MB.bin",
+        "filename": "1MB.bin",
+        "status": "failed",
+        "progress": 0
+    },
+    {
+        "url": "https://www.w3.org/WAI/WCAG21/Techniques/pdf/img/table-word.jpg",
+        "filename": "table-word.jpg",
+        "status": "completed",
+        "progress": 100
+    },
+    {
+        "url": "https://www.africau.edu/images/default/sample.pdf",
+        "filename": "sample.pdf",
+        "status": "failed",
+        "progress": 0
+    },
+    {
+        "url": "https://www.w3.org/WAI/WCAG21/wcag-2.1.pdf",
+        "filename": "wcag-2.1.pdf",
+        "status": "failed",
+        "progress": 0
+    },
+    {
+        "url": "https://ash-speed.hetzner.com/1MB.bin",
+        "filename": "",
+        "status": "failed",
+        "progress": 0
+    },
+    {
+        "url": "https://httpbin.org/bytes/102400",
+        "filename": "102400",
+        "status": "completed",
+        "progress": 100
+    },
+    {
+        "url": "https://httpbin.org/bytes/1048576",
+        "filename": "1048576",
+        "status": "completed",
+        "progress": 100
+    },
+    {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Camponotus_flavomarginatus_ant.jpg",
+        "filename": "Camponotus_flavomarginatus_ant.jpg",
+        "status": "completed",
+        "progress": 100
+    },
+    {
+        "url": "https://www.africau.edu/images/default/sample.pdf",
+        "filename": "sample.pdf",
+        "status": "failed",
+        "progress": 0
+    },
+    {
+        "url": "https://www.w3.org/WAI/WCAG21/wcag-2.1.pdf",
+        "filename": "wcag-2.1.pdf",
+        "status": "failed",
+        "progress": 0
+    },
+    {
+        "url": "https://httpbin.org/bytes/1048576",
+        "filename": "1048576",
+        "status": "completed",
+        "progress": 100
+    },
+    {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Camponotus_flavomarginatus_ant.jpg",
+        "filename": "Camponotus_flavomarginatus_ant.jpg",
+        "status": "completed",
+        "progress": 100
+    },
+    {
+        "url": "https://www.irs.gov/pub/irs-pdf/fw4.pdf",
+        "filename": "fw4.pdf",
+        "status": "completed",
+        "progress": 100
+    },
+    {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Camponotus_flavomarginatus_ant.jpg",
+        "filename": "Camponotus_flavomarginatus_ant.jpg",
+        "status": "completed",
+        "progress": 100
+    }
+]

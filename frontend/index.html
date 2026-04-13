@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple Download Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 16px;
+      background: #f7f8fa;
+      color: #222;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    input[type="url"] {
+      flex: 1;
+      min-width: 320px;
+      padding: 12px;
+      border: 1px solid #d9dce3;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .pause {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .resume {
+      background: #10b981;
+      color: white;
+    }
+
+    .delete {
+      background: #ef4444;
+      color: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #f1f5f9;
+    }
+
+    .progress-wrap {
+      width: 220px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #2563eb;
+      transition: width 0.2s ease;
+    }
+
+    .small {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #e5e7eb;
+    }
+
+    .status-downloading { background: #dbeafe; color: #1d4ed8; }
+    .status-paused { background: #fef3c7; color: #92400e; }
+    .status-completed { background: #d1fae5; color: #065f46; }
+    .status-failed { background: #fee2e2; color: #991b1b; }
+    .status-cancelled { background: #f3f4f6; color: #374151; }
+    .status-queued { background: #ede9fe; color: #5b21b6; }
+
+    .muted {
+      color: #777;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simple Download Manager</h1>
+
+  <div class="card">
+    <div class="form-row">
+      <input
+        id="urlInput"
+        type="url"
+        placeholder="Enter file URL..."
+      />
+      <button class="primary" onclick="createDownload()">Add Download</button>
+    </div>
+    <p class="muted">Backend: http://localhost:8000</p>
+  </div>
+
+  <div class="card">
+    <h3>Downloads</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>URL</th>
+          <th>Status</th>
+          <th>Progress</th>
+          <th>Speed</th>
+          <th>ETA</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="downloadsTableBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000";
+    const WS_URL = "ws://127.0.0.1:8000/ws";
+
+    const tasks = {};
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function formatSpeed(bytesPerSec) {
+      if (bytesPerSec == null || isNaN(bytesPerSec)) return "-";
+      const b = Number(bytesPerSec);
+      if (b < 1024) return `${b.toFixed(0)} B/s`;
+      if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB/s`;
+      if (b < 1024 * 1024 * 1024) return `${(b / (1024 * 1024)).toFixed(1)} MB/s`;
+      return `${(b / (1024 * 1024 * 1024)).toFixed(1)} GB/s`;
+    }
+
+    function formatEta(seconds) {
+      if (seconds == null || seconds === "" || isNaN(seconds)) return "-";
+      const s = Math.max(0, Number(seconds));
+      if (s < 60) return `${Math.round(s)}s`;
+      if (s < 3600) return `${Math.floor(s / 60)}m ${Math.round(s % 60)}s`;
+      return `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`;
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("downloadsTableBody");
+      const rows = Object.values(tasks).map(task => {
+        const progress = Number(task.progress ?? 0).toFixed(1);
+        const status = String(task.status ?? "unknown").toLowerCase();
+
+        return `
+          <tr>
+            <td>${escapeHtml(task.id)}</td>
+            <td title="${escapeHtml(task.url)}">${escapeHtml(task.url)}</td>
+            <td>
+              <span class="status-badge status-${escapeHtml(status)}">
+                ${escapeHtml(status)}
+              </span>
+            </td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${progress}%"></div>
+                </div>
+                <div class="small">${progress}%</div>
+              </div>
+            </td>
+            <td>${escapeHtml(formatSpeed(task.speed))}</td>
+            <td>${escapeHtml(formatEta(task.eta))}</td>
+            <td>
+              <button class="pause" onclick="pauseDownload('${task.id}')">Pause</button>
+              <button class="resume" onclick="resumeDownload('${task.id}')">Resume</button>
+              <button class="delete" onclick="cancelDownload('${task.id}')">Cancel</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = rows.join("") || `
+        <tr>
+          <td colspan="7" class="muted">No downloads yet.</td>
+        </tr>
+      `;
+    }
+
+    async function loadDownloads() {
+      try {
+        const res = await fetch(`${API_BASE}/downloads`);
+        const data = await res.json();
+
+        for (const item of data) {
+          tasks[item.id] = {
+            ...tasks[item.id],
+            ...item
+          };
+        }
+
+        renderTable();
+      } catch (err) {
+        console.error("Failed to load downloads:", err);
+      }
+    }
+
+    async function createDownload() {
+      const input = document.getElementById("urlInput");
+      const url = input.value.trim();
+
+      if (!url) {
+        alert("Please enter a URL.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/downloads`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || "Failed to create download");
+        }
+
+        const task = await res.json();
+        tasks[task.id] = task;
+        input.value = "";
+        renderTable();
+      } catch (err) {
+        console.error(err);
+        alert(err.message || "Error creating download");
+      }
+    }
+
+    async function pauseDownload(id) {
+      try {
+        const res = await fetch(`${API_BASE}/downloads/${id}/pause`, {
+          method: "POST"
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || "Failed to pause");
+        }
+
+        const task = await res.json();
+        tasks[id] = { ...tasks[id], ...task };
+        renderTable();
+      } catch (err) {
+        console.error(err);
+        alert(err.message || "Error pausing download");
+      }
+    }
+
+    async function resumeDownload(id) {
+      try {
+        const res = await fetch(`${API_BASE}/downloads/${id}/resume`, {
+          method: "POST"
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || "Failed to resume");
+        }
+
+        const task = await res.json();
+        tasks[id] = { ...tasks[id], ...task };
+        renderTable();
+      } catch (err) {
+        console.error(err);
+        alert(err.message || "Error resuming download");
+      }
+    }
+
+    async function cancelDownload(id) {
+      try {
+        const res = await fetch(`${API_BASE}/downloads/${id}`, {
+          method: "DELETE"
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || "Failed to cancel");
+        }
+
+        if (tasks[id]) {
+          tasks[id].status = "cancelled";
+        }
+        renderTable();
+      } catch (err) {
+        console.error(err);
+        alert(err.message || "Error cancelling download");
+      }
+    }
+
+    function connectWebSocket() {
+      const ws = new WebSocket(WS_URL);
+
+      ws.onopen = () => {
+        console.log("WebSocket connected");
+        ws.send("client-ready");
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+
+          if (!data.id) return;
+
+          tasks[data.id] = {
+            ...tasks[data.id],
+            ...data
+          };
+
+          renderTable();
+        } catch (err) {
+          console.error("WS parse error:", err);
+        }
+      };
+
+      ws.onclose = () => {
+        console.warn("WebSocket disconnected. Reconnecting in 2s...");
+        setTimeout(connectWebSocket, 2000);
+      };
+
+      ws.onerror = (err) => {
+        console.error("WebSocket error:", err);
+        ws.close();
+      };
+    }
+
+    loadDownloads();
+    connectWebSocket();
+  </script>
+</body>
+</html>
