@@ -2,10 +2,13 @@ import requests
 import time
 import os
 
+<<<<<<< HEAD
 DEFAULT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 }
 
+=======
+>>>>>>> a168887f4fc2c8ee6edafa150b4c48dbaa578ae1
 
 def download_segment(
     url,
@@ -19,6 +22,10 @@ def download_segment(
 ):
     attempt = 0
 
+<<<<<<< HEAD
+=======
+    # 🔥 RESUME SUPPORT
+>>>>>>> a168887f4fc2c8ee6edafa150b4c48dbaa578ae1
     downloaded = 0
     if os.path.exists(part_file):
         downloaded = os.path.getsize(part_file)
@@ -26,6 +33,7 @@ def download_segment(
     current_start = start + downloaded
 
     if current_start > end:
+<<<<<<< HEAD
         return
 
     while attempt < max_retries:
@@ -38,22 +46,48 @@ def download_segment(
             }
 
             with requests.get(url, headers=headers, stream=True, timeout=30) as response:
+=======
+        return  # already done
+
+    headers = {"Range": f"bytes={current_start}-{end}"}
+
+    while attempt < max_retries:
+        try:
+            with requests.get(url, headers=headers, stream=True) as response:
+>>>>>>> a168887f4fc2c8ee6edafa150b4c48dbaa578ae1
                 response.raise_for_status()
 
                 with open(part_file, "ab") as f:
                     for chunk in response.iter_content(chunk_size=8192):
                         if stop_flag["stop"]:
                             return
+<<<<<<< HEAD
                         if chunk:
                             if limiter:
                                 limiter.consume(len(chunk))
                             f.write(chunk)
                             progress_callback(len(chunk))
+=======
+
+                        if chunk:
+                            if limiter:
+                                limiter.consume(len(chunk))
+
+                            f.write(chunk)
+                            progress_callback(len(chunk))
+
+>>>>>>> a168887f4fc2c8ee6edafa150b4c48dbaa578ae1
             return
 
         except Exception as e:
             attempt += 1
             print(f"[Retry {attempt}] Segment {start}-{end} failed: {e}")
+<<<<<<< HEAD
             time.sleep(2)
 
     raise Exception(f"Segment {start}-{end} failed after {max_retries} retries")
+=======
+            time.sleep(1)
+
+    raise Exception(f"Segment {start}-{end} failed after retries")
+>>>>>>> a168887f4fc2c8ee6edafa150b4c48dbaa578ae1

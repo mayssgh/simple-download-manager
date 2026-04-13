@@ -12,8 +12,12 @@ from pydantic import BaseModel, HttpUrl
 
 # Shared models - DO NOT rename / modify on your side
 from models import DownloadTask, DownloadStatus
+<<<<<<< HEAD
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+=======
+
+>>>>>>> a168887f4fc2c8ee6edafa150b4c48dbaa578ae1
 # Core engine functions implemented by your teammate
 from download_manager import (
     start_download,
@@ -168,12 +172,15 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Simple Download Manager API", lifespan=lifespan)
 
+<<<<<<< HEAD
 app.mount("/static", StaticFiles(directory="../frontend"), name="static")
 
 @app.get("/")
 async def serve_frontend():
     return FileResponse("../frontend/index.html")
 
+=======
+>>>>>>> a168887f4fc2c8ee6edafa150b4c48dbaa578ae1
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
