@@ -1,399 +1,319 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simple Download Manager</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 1100px;
-      margin: 40px auto;
-      padding: 0 16px;
-      background: #f7f8fa;
-      color: #222;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-    h1 {
-      margin-bottom: 20px;
-    }
+<title>Download Hub</title>
 
-    .card {
-      background: white;
-      border-radius: 14px;
-      padding: 20px;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-      margin-bottom: 20px;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    .form-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+<style>
+:root {
+  --bg: #0a0e18;
+  --card: #1c1f2a;
+  --card2: #171b26;
 
-    input[type="url"] {
-      flex: 1;
-      min-width: 320px;
-      padding: 12px;
-      border: 1px solid #d9dce3;
-      border-radius: 10px;
-      font-size: 14px;
-    }
+  --primary: #4d8eff;
+  --primary-soft: #adc6ff;
 
-    button {
-      padding: 10px 14px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+  --text: #dfe2f1;
+  --muted: #7a8094;
 
-    .primary {
-      background: #2563eb;
-      color: white;
-    }
+  --danger: #ff6b6b;
+  --success: #34d399;
+  --warning: #fbbf24;
+}
 
-    .pause {
-      background: #f59e0b;
-      color: white;
-    }
+body {
+  margin: 0;
+  font-family: 'Manrope', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
 
-    .resume {
-      background: #10b981;
-      color: white;
-    }
+/* LAYOUT */
+.app {
+  display: flex;
+  height: 100vh;
+}
 
-    .delete {
-      background: #ef4444;
-      color: white;
-    }
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  background: var(--card);
+  padding: 30px;
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      overflow: hidden;
-      border-radius: 12px;
-    }
+.nav-item {
+  margin-bottom: 15px;
+  cursor: pointer;
+  color: var(--muted);
+  transition: 0.2s;
+}
 
-    th, td {
-      padding: 12px;
-      border-bottom: 1px solid #eee;
-      text-align: left;
-      vertical-align: middle;
-    }
+.nav-item.active {
+  color: var(--primary-soft);
+}
 
-    th {
-      background: #f1f5f9;
-    }
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
 
-    .progress-wrap {
-      width: 220px;
-    }
+/* INPUT */
+.input-box {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 20px;
+  margin-bottom: 30px;
+}
 
-    .progress-bar {
-      width: 100%;
-      height: 12px;
-      background: #e5e7eb;
-      border-radius: 999px;
-      overflow: hidden;
-      margin-bottom: 6px;
-    }
+input {
+  width: 100%;
+  padding: 12px;
+  background: var(--card2);
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  color: var(--text);
+}
 
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      background: #2563eb;
-      transition: width 0.2s ease;
-    }
+input:focus {
+  outline: none;
+  border-bottom: 2px solid var(--primary);
+}
 
-    .small {
-      font-size: 12px;
-      color: #666;
-    }
+/* BUTTONS */
+button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
 
-    .status-badge {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: bold;
-      background: #e5e7eb;
-    }
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
-    .status-downloading { background: #dbeafe; color: #1d4ed8; }
-    .status-paused { background: #fef3c7; color: #92400e; }
-    .status-completed { background: #d1fae5; color: #065f46; }
-    .status-failed { background: #fee2e2; color: #991b1b; }
-    .status-cancelled { background: #f3f4f6; color: #374151; }
-    .status-queued { background: #ede9fe; color: #5b21b6; }
+.primary {
+  margin-top: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-soft));
+  color: black;
+}
 
-    .muted {
-      color: #777;
-      font-size: 14px;
-    }
-  </style>
+.pause { background: var(--warning); }
+.resume { background: var(--success); }
+.delete { background: var(--danger); }
+
+/* CARD */
+.card {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* PROGRESS */
+.progress {
+  height: 6px;
+  background: #111;
+  border-radius: 999px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-soft));
+  transition: width 0.4s ease; /* 🔥 smooth animation */
+  width: 0%;
+}
+
+/* TEXT */
+.small {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.status {
+  font-size: 12px;
+}
+
+.downloading { color: var(--primary-soft); }
+.completed { color: var(--success); }
+.paused { color: var(--warning); }
+.failed { color: var(--danger); }
+.cancelled { color: var(--muted); }
+</style>
 </head>
-<body>
-  <h1>Simple Download Manager</h1>
 
-  <div class="card">
-    <div class="form-row">
-      <input
-        id="urlInput"
-        type="url"
-        placeholder="Enter file URL..."
-      />
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h2>Downloads</h2>
+
+    <div class="nav-item active" onclick="setFilter(event,'all')">All</div>
+    <div class="nav-item" onclick="setFilter(event,'downloading')">Active</div>
+    <div class="nav-item" onclick="setFilter(event,'completed')">Finished</div>
+    <div class="nav-item" onclick="setFilter(event,'cancelled')">Trash</div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="input-box">
+      <input id="urlInput" placeholder="Paste file URL..." />
       <button class="primary" onclick="createDownload()">Add Download</button>
     </div>
-    <p class="muted">Backend: http://localhost:8000</p>
+
+    <div id="downloadsContainer"></div>
+
   </div>
 
-  <div class="card">
-    <h3>Downloads</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>URL</th>
-          <th>Status</th>
-          <th>Progress</th>
-          <th>Speed</th>
-          <th>ETA</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="downloadsTableBody"></tbody>
-    </table>
-  </div>
+</div>
 
-  <script>
-<<<<<<< HEAD
-    const API_BASE = "http://127.0.0.1:8000";
-    const WS_URL = "ws://127.0.0.1:8000/ws";
-=======
-    const API_BASE = "http://localhost:8000";
-    const WS_URL = "ws://localhost:8000/ws";
->>>>>>> a168887f4fc2c8ee6edafa150b4c48dbaa578ae1
+<script>
+const API_BASE = "http://127.0.0.1:8000";
+const WS_URL = "ws://127.0.0.1:8000/ws";
 
-    const tasks = {};
+const tasks = {};
+let currentFilter = "all";
 
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
+/* 🔥 Smooth rendering */
+let renderScheduled = false;
 
-    function formatSpeed(bytesPerSec) {
-      if (bytesPerSec == null || isNaN(bytesPerSec)) return "-";
-      const b = Number(bytesPerSec);
-      if (b < 1024) return `${b.toFixed(0)} B/s`;
-      if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB/s`;
-      if (b < 1024 * 1024 * 1024) return `${(b / (1024 * 1024)).toFixed(1)} MB/s`;
-      return `${(b / (1024 * 1024 * 1024)).toFixed(1)} GB/s`;
-    }
+function scheduleRender() {
+  if (!renderScheduled) {
+    renderScheduled = true;
+    requestAnimationFrame(() => {
+      render();
+      renderScheduled = false;
+    });
+  }
+}
 
-    function formatEta(seconds) {
-      if (seconds == null || seconds === "" || isNaN(seconds)) return "-";
-      const s = Math.max(0, Number(seconds));
-      if (s < 60) return `${Math.round(s)}s`;
-      if (s < 3600) return `${Math.floor(s / 60)}m ${Math.round(s % 60)}s`;
-      return `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`;
-    }
+/* Extract filename */
+function getFileName(url) {
+  try {
+    return url.split('/').pop().split('?')[0] || "file";
+  } catch {
+    return "file";
+  }
+}
 
-    function renderTable() {
-      const tbody = document.getElementById("downloadsTableBody");
-      const rows = Object.values(tasks).map(task => {
-        const progress = Number(task.progress ?? 0).toFixed(1);
-        const status = String(task.status ?? "unknown").toLowerCase();
+/* RENDER */
+function render() {
+  const container = document.getElementById("downloadsContainer");
 
-        return `
-          <tr>
-            <td>${escapeHtml(task.id)}</td>
-            <td title="${escapeHtml(task.url)}">${escapeHtml(task.url)}</td>
-            <td>
-              <span class="status-badge status-${escapeHtml(status)}">
-                ${escapeHtml(status)}
-              </span>
-            </td>
-            <td>
-              <div class="progress-wrap">
-                <div class="progress-bar">
-                  <div class="progress-fill" style="width: ${progress}%"></div>
-                </div>
-                <div class="small">${progress}%</div>
-              </div>
-            </td>
-            <td>${escapeHtml(formatSpeed(task.speed))}</td>
-            <td>${escapeHtml(formatEta(task.eta))}</td>
-            <td>
-              <button class="pause" onclick="pauseDownload('${task.id}')">Pause</button>
-              <button class="resume" onclick="resumeDownload('${task.id}')">Resume</button>
-              <button class="delete" onclick="cancelDownload('${task.id}')">Cancel</button>
-            </td>
-          </tr>
-        `;
-      });
+  const filtered = Object.values(tasks).filter(t => {
+    if (currentFilter === "all") return true;
+    if (currentFilter === "downloading") return t.status === "downloading";
+    if (currentFilter === "completed") return t.status === "completed";
+    if (currentFilter === "cancelled") return t.status === "cancelled";
+    return true;
+  });
 
-      tbody.innerHTML = rows.join("") || `
-        <tr>
-          <td colspan="7" class="muted">No downloads yet.</td>
-        </tr>
-      `;
-    }
+  container.innerHTML = filtered.map(t => {
+    const p = Number(t.progress || 0).toFixed(1);
+    const status = (t.status || "").toLowerCase();
 
-    async function loadDownloads() {
-      try {
-        const res = await fetch(`${API_BASE}/downloads`);
-        const data = await res.json();
+    return `
+      <div class="card">
+        <div class="row">
+          <div>
+            <div>${getFileName(t.url)}</div>
+            <div class="status ${status}">${status}</div>
+          </div>
 
-        for (const item of data) {
-          tasks[item.id] = {
-            ...tasks[item.id],
-            ...item
-          };
-        }
+          <div>
+            <button class="pause" ${status !== "downloading" ? "disabled" : ""} onclick="pauseDownload('${t.id}')">Pause</button>
+            <button class="resume" ${status !== "paused" ? "disabled" : ""} onclick="resumeDownload('${t.id}')">Resume</button>
+            <button class="delete" onclick="cancelDownload('${t.id}')">X</button>
+          </div>
+        </div>
 
-        renderTable();
-      } catch (err) {
-        console.error("Failed to load downloads:", err);
-      }
-    }
+        <div class="progress">
+          <div class="fill" style="width:${p}%"></div>
+        </div>
 
-    async function createDownload() {
-      const input = document.getElementById("urlInput");
-      const url = input.value.trim();
+        <div class="small">
+          ${p}% • ${t.speed || "-"} • ${t.eta || "-"}
+        </div>
+      </div>
+    `;
+  }).join("") || `<div class="small">No downloads</div>`;
+}
 
-      if (!url) {
-        alert("Please enter a URL.");
-        return;
-      }
+/* FILTER */
+function setFilter(e, filter) {
+  currentFilter = filter;
 
-      try {
-        const res = await fetch(`${API_BASE}/downloads`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url })
-        });
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  e.target.classList.add("active");
 
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.detail || "Failed to create download");
-        }
+  scheduleRender();
+}
 
-        const task = await res.json();
-        tasks[task.id] = task;
-        input.value = "";
-        renderTable();
-      } catch (err) {
-        console.error(err);
-        alert(err.message || "Error creating download");
-      }
-    }
+/* API */
+async function createDownload() {
+  const url = document.getElementById("urlInput").value;
+  if (!url) return alert("Enter URL");
 
-    async function pauseDownload(id) {
-      try {
-        const res = await fetch(`${API_BASE}/downloads/${id}/pause`, {
-          method: "POST"
-        });
+  const res = await fetch(`${API_BASE}/downloads`, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ url })
+  });
 
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.detail || "Failed to pause");
-        }
+  const task = await res.json();
+  tasks[task.id] = task;
 
-        const task = await res.json();
-        tasks[id] = { ...tasks[id], ...task };
-        renderTable();
-      } catch (err) {
-        console.error(err);
-        alert(err.message || "Error pausing download");
-      }
-    }
+  document.getElementById("urlInput").value = "";
+  scheduleRender();
+}
 
-    async function resumeDownload(id) {
-      try {
-        const res = await fetch(`${API_BASE}/downloads/${id}/resume`, {
-          method: "POST"
-        });
+async function pauseDownload(id) {
+  await fetch(`${API_BASE}/downloads/${id}/pause`, { method: "POST" });
+}
 
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.detail || "Failed to resume");
-        }
+async function resumeDownload(id) {
+  await fetch(`${API_BASE}/downloads/${id}/resume`, { method: "POST" });
+}
 
-        const task = await res.json();
-        tasks[id] = { ...tasks[id], ...task };
-        renderTable();
-      } catch (err) {
-        console.error(err);
-        alert(err.message || "Error resuming download");
-      }
-    }
+async function cancelDownload(id) {
+  await fetch(`${API_BASE}/downloads/${id}`, { method: "DELETE" });
+}
 
-    async function cancelDownload(id) {
-      try {
-        const res = await fetch(`${API_BASE}/downloads/${id}`, {
-          method: "DELETE"
-        });
+/* WS */
+function connectWebSocket() {
+  const ws = new WebSocket(WS_URL);
 
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.detail || "Failed to cancel");
-        }
+  ws.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    tasks[data.id] = { ...tasks[data.id], ...data };
+    scheduleRender();
+  };
 
-        if (tasks[id]) {
-          tasks[id].status = "cancelled";
-        }
-        renderTable();
-      } catch (err) {
-        console.error(err);
-        alert(err.message || "Error cancelling download");
-      }
-    }
+  ws.onclose = () => setTimeout(connectWebSocket, 2000);
+}
 
-    function connectWebSocket() {
-      const ws = new WebSocket(WS_URL);
+connectWebSocket();
+</script>
 
-      ws.onopen = () => {
-        console.log("WebSocket connected");
-        ws.send("client-ready");
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-
-          if (!data.id) return;
-
-          tasks[data.id] = {
-            ...tasks[data.id],
-            ...data
-          };
-
-          renderTable();
-        } catch (err) {
-          console.error("WS parse error:", err);
-        }
-      };
-
-      ws.onclose = () => {
-        console.warn("WebSocket disconnected. Reconnecting in 2s...");
-        setTimeout(connectWebSocket, 2000);
-      };
-
-      ws.onerror = (err) => {
-        console.error("WebSocket error:", err);
-        ws.close();
-      };
-    }
-
-    loadDownloads();
-    connectWebSocket();
-  </script>
 </body>
 </html>
