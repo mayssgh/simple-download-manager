@@ -542,68 +542,100 @@
 
   /* ── RENDER ── */
   function render() {
-    const container = document.getElementById("downloadsContainer");
-    const empty = document.getElementById("emptyState");
+  const container = document.getElementById("downloadsContainer");
+  const empty = document.getElementById("emptyState");
 
-    const filtered = Object.values(tasks).filter(t => {
-      if (currentFilter === "all") return true;
-      return t.status === currentFilter;
-    });
+  const filtered = Object.values(tasks).filter(t => {
+    if (currentFilter === "all") return true;
+    return t.status === currentFilter;
+  });
 
-    if (!filtered.length) {
-      container.innerHTML = "";
-      empty.style.display = "block";
-      return;
-    }
+  if (!filtered.length) {
+    container.innerHTML = "";
+    empty.style.display = "block";
+    updateCounts();
+    return;
+  }
 
-    empty.style.display = "none";
+  empty.style.display = "none";
 
-    container.innerHTML = filtered.map(t => {
-      const p = Number(t.progress || 0).toFixed(1);
-      const status = String(t.status || "unknown").toLowerCase();
-      const fillClass = ["completed","failed","paused"].includes(status) ? status : "";
+  filtered.forEach(t => {
+    const p = Number(t.progress || 0).toFixed(1);
+    const status = String(t.status || "unknown").toLowerCase();
+    const fillClass = ["completed","failed","paused"].includes(status) ? status : "";
 
-      return `
-        <div class="card" id="card-${esc(t.id)}">
-          <div class="card-top">
-            <div class="card-info">
-              <div class="card-url" title="${esc(t.url)}">${esc(t.url)}</div>
-              <div class="card-meta">
-                <span class="badge badge-${esc(status)}">
-                  <span class="badge-dot"></span>${esc(status)}
-                </span>
-                <span class="stat">Speed <span>${formatSpeed(t.speed)}</span></span>
-                <span class="stat">ETA <span>${formatEta(t.eta)}</span></span>
-              </div>
-            </div>
-            <div class="card-actions">
-              <button class="btn-icon warning" title="Pause" onclick="pauseDownload('${esc(t.id)}')">
-                <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-              </button>
-              <button class="btn-icon success" title="Resume" onclick="resumeDownload('${esc(t.id)}')">
-                <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-              </button>
-              <button class="btn-icon danger" title="Cancel" onclick="cancelDownload('${esc(t.id)}')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
+    let card = document.getElementById(`card-${t.id}`);
+
+    if (!card) {
+      // Create new card only if it doesn't exist
+      card = document.createElement("div");
+      card.className = "card";
+      card.id = `card-${t.id}`;
+      card.innerHTML = `
+        <div class="card-top">
+          <div class="card-info">
+            <div class="card-url" title="${esc(t.url)}">${esc(t.url)}</div>
+            <div class="card-meta">
+              <span class="badge badge-${esc(status)}" id="badge-${t.id}">
+                <span class="badge-dot"></span><span id="badge-text-${t.id}">${esc(status)}</span>
+              </span>
+              <span class="stat">Speed <span id="speed-${t.id}">—</span></span>
+              <span class="stat">ETA <span id="eta-${t.id}">—</span></span>
             </div>
           </div>
-
-          <div class="progress-wrap">
-            <div class="progress-track">
-              <div class="progress-fill ${fillClass}" style="width:${p}%"></div>
-            </div>
-            <div class="progress-label">
-              <span>${p}%</span>
-              <span>${status === 'completed' ? 'Done' : status === 'failed' ? 'Failed' : ''}</span>
-            </div>
+          <div class="card-actions">
+            <button class="btn-icon warning" title="Pause" onclick="pauseDownload('${esc(t.id)}')">
+              <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            </button>
+            <button class="btn-icon success" title="Resume" onclick="resumeDownload('${esc(t.id)}')">
+              <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+            <button class="btn-icon danger" title="Cancel" onclick="cancelDownload('${esc(t.id)}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-track">
+            <div class="progress-fill ${fillClass}" id="fill-${t.id}" style="width:${p}%"></div>
+          </div>
+          <div class="progress-label">
+            <span id="pct-${t.id}">${p}%</span>
+            <span id="status-label-${t.id}"></span>
           </div>
         </div>
       `;
-    }).join("");
+      container.appendChild(card);
+    } else {
+      // Just update the changing parts — no flicker!
+      const badge = document.getElementById(`badge-${t.id}`);
+      if (badge) {
+        badge.className = `badge badge-${esc(status)}`;
+        document.getElementById(`badge-text-${t.id}`).textContent = status;
+      }
+      const fill = document.getElementById(`fill-${t.id}`);
+      if (fill) {
+        fill.style.width = `${p}%`;
+        fill.className = `progress-fill ${fillClass}`;
+      }
+      const pct = document.getElementById(`pct-${t.id}`);
+      if (pct) pct.textContent = `${p}%`;
 
-    updateCounts();
-  }
+      const statusLabel = document.getElementById(`status-label-${t.id}`);
+      if (statusLabel) {
+        statusLabel.textContent = status === "completed" ? "Done" : status === "failed" ? "Failed" : "";
+      }
+    }
+
+    // Always update speed and ETA
+    const speedEl = document.getElementById(`speed-${t.id}`);
+    if (speedEl) speedEl.textContent = formatSpeed(t.speed);
+    const etaEl = document.getElementById(`eta-${t.id}`);
+    if (etaEl) etaEl.textContent = formatEta(t.eta);
+  });
+
+  updateCounts();
+}
 
   /* ── API ── */
   async function loadDownloads() {
