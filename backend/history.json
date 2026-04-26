@@ -2,61 +2,61 @@
     {
         "url": "https://www.irs.gov/pub/irs-pdf/fw4.pdf",
         "filename": "fw4.pdf",
-        "status": "cancelled",
+        "status": "completed",
         "progress": 100
     },
     {
         "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Camponotus_flavomarginatus_ant.jpg",
         "filename": "Camponotus_flavomarginatus_ant.jpg",
-        "status": "completed",
-        "progress": 100
+        "status": "failed",
+        "progress": 50.0
     },
     {
         "url": "https://httpbin.org/bytes/1048576",
         "filename": "1048576",
-        "status": "cancelled",
-        "progress": 100
-    },
-    {
-        "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Camponotus_flavomarginatus_ant.jpg",
-        "filename": "Camponotus_flavomarginatus_ant.jpg",
         "status": "completed",
         "progress": 100
     },
     {
         "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Camponotus_flavomarginatus_ant.jpg",
         "filename": "Camponotus_flavomarginatus_ant.jpg",
-        "status": "completed",
-        "progress": 100
+        "status": "failed",
+        "progress": 50.0
     },
     {
         "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Camponotus_flavomarginatus_ant.jpg",
         "filename": "Camponotus_flavomarginatus_ant.jpg",
-        "status": "completed",
-        "progress": 100
+        "status": "failed",
+        "progress": 50.0
     },
     {
         "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Camponotus_flavomarginatus_ant.jpg",
         "filename": "Camponotus_flavomarginatus_ant.jpg",
-        "status": "completed",
-        "progress": 100
+        "status": "failed",
+        "progress": 50.0
     },
     {
         "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Camponotus_flavomarginatus_ant.jpg",
         "filename": "Camponotus_flavomarginatus_ant.jpg",
-        "status": "completed",
-        "progress": 100
+        "status": "failed",
+        "progress": 50.0
+    },
+    {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Camponotus_flavomarginatus_ant.jpg",
+        "filename": "Camponotus_flavomarginatus_ant.jpg",
+        "status": "failed",
+        "progress": 50.0
     },
     {
         "url": "https://httpbin.org/bytes/1048576",
         "filename": "1048576",
-        "status": "cancelled",
+        "status": "completed",
         "progress": 100
     },
     {
         "url": "https://speed.hetzner.de/1MB.bin",
         "filename": "1MB.bin",
-        "status": "cancelled",
+        "status": "failed",
         "progress": 0
     },
     {
@@ -88,5 +88,29 @@
         "filename": "100Mb.dat",
         "status": "paused",
         "progress": 3.24
+    },
+    {
+        "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Camponotus_flavomarginatus_ant.jpg",
+        "filename": "Camponotus_flavomarginatus_ant.jpg",
+        "status": "failed",
+        "progress": 50.0
+    },
+    {
+        "url": "https://httpbin.org/bytes/1048576",
+        "filename": "1048576",
+        "status": "completed",
+        "progress": 100
+    },
+    {
+        "url": "https://www.irs.gov/pub/irs-pdf/fw4.pdf",
+        "filename": "fw4.pdf",
+        "status": "completed",
+        "progress": 100
+    },
+    {
+        "url": "https://speed.hetzner.de/1MB.bin",
+        "filename": "1MB.bin",
+        "status": "failed",
+        "progress": 0
     }
 ]
