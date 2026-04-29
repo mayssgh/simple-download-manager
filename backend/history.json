@@ -112,5 +112,17 @@
         "filename": "1MB.bin",
         "status": "failed",
         "progress": 0
+    },
+    {
+        "url": "https://www.irs.gov/pub/irs-pdf/fw4.pdf",
+        "filename": "fw4.pdf",
+        "status": "completed",
+        "progress": 100
+    },
+    {
+        "url": "https://httpbin.org/image/jpeg",
+        "filename": "jpeg",
+        "status": "completed",
+        "progress": 100
     }
 ]

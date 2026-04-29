@@ -1,4 +1,6 @@
 from __future__ import annotations
+import os
+from fastapi.responses import FileResponse as FastAPIFileResponse
 
 import asyncio
 from contextlib import asynccontextmanager
@@ -245,3 +247,26 @@ async def websocket_endpoint(websocket: WebSocket):
         CLIENTS.discard(websocket)
     except Exception:
         CLIENTS.discard(websocket)
+
+@app.get("/downloads/{task_id}/file")
+async def download_file(task_id: str):
+    from download_manager import _manager
+    data = _manager.downloads.get(task_id)
+
+    if not data:
+        raise HTTPException(status_code=404, detail="Download not found")
+
+    filename = data.get("filename")
+    if not filename:
+        raise HTTPException(status_code=404, detail="File not ready")
+
+    file_path = os.path.join(_manager.download_dir, filename)
+
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="File not found on disk")
+
+    return FastAPIFileResponse(
+        file_path,
+        filename=filename,
+        media_type="application/octet-stream"
+    )

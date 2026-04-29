@@ -593,6 +593,17 @@
             <button class="btn-icon danger" title="Cancel" onclick="cancelDownload('${esc(t.id)}')">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
+            ${status === 'completed' ? `
+                <a href="${API_BASE}/downloads/${esc(t.id)}/file" 
+                target="_blank"
+                class="btn-icon success" title="Open file">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                </a>
+            ` : ''}
           </div>
         </div>
         <div class="progress-wrap">
@@ -625,6 +636,27 @@
       if (statusLabel) {
         statusLabel.textContent = status === "completed" ? "Done" : status === "failed" ? "Failed" : "";
       }
+      // 🔥 ADD OPEN BUTTON DYNAMICALLY AFTER COMPLETION
+    const actions = card.querySelector(".card-actions");
+    if (actions) {
+    const existing = actions.querySelector(".open-btn");
+
+    if (status === "completed" && !existing) {
+        const btn = document.createElement("a");
+        btn.href = `${API_BASE}/downloads/${t.id}/file`;
+        btn.target = "_blank";
+        btn.className = "btn-icon success open-btn";
+        btn.title = "Open file";
+        btn.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        `;
+        actions.appendChild(btn);
+    }
+}
     }
 
     // Always update speed and ETA
