@@ -101,3 +101,13 @@ This project follows a **Client–Server Layered Architecture**.
 ```bash
 git clone https://github.com/mayssgh/simple-download-manager.git
 cd simple-download-manager/backend
+
+## ▶️ How to Run
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/mayssgh/simple-download-manager.git
+cd simple-download-manager/backend
+
+## 🎥 Demo
+https://msbtn-my.sharepoint.com/:u:/g/personal/mayssa_ghabarou_medtech_tn/IQBP4O9sNUUnRJ4AUPpAh-28AT6eXECpJVzfNa_uHChOe3w?email=ayoub.bousselmi%40medtech.tn&e=q8RB3Q
